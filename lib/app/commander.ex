@@ -145,6 +145,12 @@ defmodule App.Commander do
     end
   end
 
+  defmacro user_info do
+    quote do
+      Nadia.get_me
+    end
+  end
+
   # Helpers
 
   defmacro get_chat_id do

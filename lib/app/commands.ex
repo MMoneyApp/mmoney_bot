@@ -4,67 +4,51 @@ defmodule App.Commands do
 
   alias App.Commands.Outside
 
-  # You can create commands in the format `/command` by
-  # using the macro `command "command"`.
-  command ["hello", "hi"] do
-    # Logger module injected from App.Commander
-    Logger.log :info, "Command /hello or /hi"
+  @language "en"
 
-    # You can use almost any function from the Nadia core without
-    # having to specify the current chat ID as you can see below.
-    # For example, `Nadia.send_message/3` takes as first argument
-    # the ID of the chat you want to send this message. Using the
-    # macro `send_message/2` defined at App.Commander, it is
-    # injected the proper ID at the function. Go take a look.
-    #
-    # See also: https://hexdocs.pm/nadia/Nadia.html
-    send_message "Hello Maxim !
-      Welcome to MMoney Bot! I helps to control your pocket money :)
-
-      Lets use helpful commands:
-
-      /start - start using bot
-      /balance - your current balance
-      /profit - revenue in current month
-      /expense - info about you expense
-      /add - alias to profit
-      /remind - reminder for payment (flat, shop, gifts)
-      /language - change language info
-      /help - show help information
-
-      Also I understant plain text, for example:
-      \"I recieve salary 1000$\" - I`ll add to profit this info
-      Lets try me!"
+  def language do
+    Logger.log :info, IO.puts @language
   end
 
-  # You may split code to other modules using the syntax
+  def help_commands do
+"/start - start using bot
+/balance - your current balance
+/remind - reminder for payment (flat, shop, gifts)
+/categories - manage categories
+/trans - transaction details
+/stats - monthly report
+/help - show help information"
+  end
+
   # "Module, :function" instead od "do..end"
   command "outside", Outside, :outside
-  # For the sake of this tutorial, I'll define everything here
 
   command "start" do
     Logger.log :info, "Command /start"
 
-    {:ok, _} = send_message "Select language:",
-      reply_markup: %Model.InlineKeyboardMarkup{
-        inline_keyboard: [
-          [
-            %{
-              callback_data: "/language en",
-              text: "English",
-            },
-            %{
-              callback_data: "/language ru",
-              text: "Russian",
-            },
-          ]
-        ]
-      }
+    send_message "Welcome to MMoney Bot!
+I help to control your pocket money :)
+
+Use helpful commands:
+#{help_commands}
+
+For add expense use plain text \"amount category\":
+  150 food
+  250 drinks
+
+Use \"+2000\" command if you want add balance.
+  +2000 salary
+  +200 cash
+
+Lets try me!"
   end
 
-  def language(lang) do
-    Logger.log :info, IO.puts lang
+  command "help" do
+    Logger.log :info, "Command /help"
+    send_message "Help commands:
+    #{help_commands}"
   end
+
 
   # You can create command interfaces for callback querys using this macro.
   callback_query_command "language" do
@@ -73,10 +57,10 @@ defmodule App.Commands do
     case update.callback_query.data do
       "/language en" ->
         answer_callback_query text: "Indeed you have good taste."
-        language("en")
+        language
       "/language ru" ->
         answer_callback_query text: "I can't agree more."
-        language("ru")
+        language
     end
   end
 
